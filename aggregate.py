@@ -1,16 +1,16 @@
 #!/usr/bin/env python3
-"""Merge custom preferred IPs with upstream best-cf-ips lists.
+"""Merge upstream best-cf-ips lists into aggregated-ips.txt.
 
 Sources:
   - https://raw.githubusercontent.com/LancelotRar/best-cf-ips/main/best-cf-ip-collected.txt
   - https://raw.githubusercontent.com/LancelotRar/best-cf-ips/main/best-cf-ip-scanned-top100.txt
-  - custom-ips.txt (local, curated; oldest, goes last)
 Output: aggregated-ips.txt (one IP:port#name per line, deduped by IP:port).
 Order: newest first. Upstream sources are ordered by the timestamp in
 their own header line (e.g. "# 74 best ips collected at 2026-10-13 20:13"),
-newest first; custom-ips.txt has no timestamp and is treated as oldest,
-so it always goes last. Within each source the original order is kept.
+newest first. Within each source the original order is kept.
 On duplicate IP:port the newer source's line wins (first occurrence wins).
+NOTE: custom-ips.txt is no longer merged (2026-10-13, user request).
+The file stays in the repo as a backup, but aggregate.py ignores it.
 """
 import re
 import urllib.request
@@ -47,9 +47,7 @@ def key_of(line):
 def main():
     seen = set()
     merged = []
-    with open("custom-ips.txt", encoding="utf-8") as f:
-        custom = parse_lines(f.read())
-    # 先拉上游，按各自头里的时间戳新到旧排；custom 无时间戳、当最旧放最后。
+    # 只合上游，按各自头里的时间戳新到旧排；custom 不再合并。
     fetched = []
     for url in UPSTREAM:
         try:
@@ -69,19 +67,11 @@ def main():
                 merged.append(line)
                 n_new += 1
         print(f"{url} (updated {ts or 'unknown'}): +{n_new} new")
-    n_upstream = len(merged)
-    n_custom = 0
-    for line in custom:
-        k = key_of(line)
-        if k not in seen:
-            seen.add(k)
-            merged.append(line)
-            n_custom += 1
     # 不写 # 注释头：订阅接口解析器不跳过 # 行，会把注释当成一条 IP，
     # 空 IP + 默认端口拼成 ":443# ..." 这种脏数据。更新时间看 git 提交记录。
     with open("aggregated-ips.txt", "w", encoding="utf-8") as f:
         f.write("\n".join(merged) + "\n")
-    print(f"upstream={n_upstream} custom={n_custom} total={len(merged)}")
+    print(f"upstream={len(merged)} total={len(merged)}")
 
 if __name__ == "__main__":
     main()
