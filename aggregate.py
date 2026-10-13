@@ -7,7 +7,6 @@ Sources:
   - https://raw.githubusercontent.com/LancelotRar/best-cf-ips/main/best-cf-ip-scanned-top100.txt
 Output: aggregated-ips.txt (one IP:port#name per line, deduped by IP:port).
 """
-import datetime
 import urllib.request
 
 UPSTREAM = [
@@ -54,11 +53,10 @@ def main():
                 merged.append(line)
                 n_new += 1
         print(f"{url}: +{n_new} new")
-    now = datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
-    header = [f"# Aggregated Cloudflare preferred IPs updated {now}",
-              f"# Sources: custom-ips.txt ({n_custom}) + upstream best-cf-ips (collected + top100)"]
+    # 不写 # 注释头：订阅接口解析器不跳过 # 行，会把注释当成一条 IP，
+    # 空 IP + 默认端口拼成 ":443# ..." 这种脏数据。更新时间看 git 提交记录。
     with open("aggregated-ips.txt", "w", encoding="utf-8") as f:
-        f.write("\n".join(header + merged) + "\n")
+        f.write("\n".join(merged) + "\n")
     print(f"custom={n_custom} total={len(merged)}")
 
 if __name__ == "__main__":
