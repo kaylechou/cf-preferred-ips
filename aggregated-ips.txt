@@ -1,4 +1,4 @@
-# Aggregated Cloudflare preferred IPs, updated 2026-10-13 13:13 UTC
+# Aggregated Cloudflare preferred IPs updated 2026-10-13 13:18 UTC
 # Sources: custom-ips.txt (133) + upstream best-cf-ips (collected + top100)
 141.101.122.49:2096#US 电信优选[155ms]
 141.101.122.200:2096#US 电信优选[159ms]
