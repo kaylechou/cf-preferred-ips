@@ -55,7 +55,7 @@ def main():
                 n_new += 1
         print(f"{url}: +{n_new} new")
     now = datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
-    header = [f"# Aggregated Cloudflare preferred IPs, updated {now}",
+    header = [f"# Aggregated Cloudflare preferred IPs updated {now}",
               f"# Sources: custom-ips.txt ({n_custom}) + upstream best-cf-ips (collected + top100)"]
     with open("aggregated-ips.txt", "w", encoding="utf-8") as f:
         f.write("\n".join(header + merged) + "\n")
